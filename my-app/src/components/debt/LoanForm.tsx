@@ -2,9 +2,11 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import PartnerPicker from "@/components/partners/PartnerPicker";
 import { createLoan } from "@/lib/loans-actions";
 import { APP_ROUTES } from "@/lib/routes";
 import type { AccountOption, LoanInput, PartnerOption } from "@/lib/types";
+import { MoneyInput } from "@/components/ui/money-input";
 
 const fieldClass =
   "w-full rounded-lg border border-card-border bg-card px-3 py-2 text-title outline-none focus:border-primary-300 disabled:bg-soft disabled:text-ink-muted";
@@ -23,7 +25,7 @@ export default function LoanForm({
 
   const [reference, setReference] = useState("");
   const [lenderPartnerId, setLenderPartnerId] = useState("");
-  const [liabilityAccountId, setLiabilityAccountId] = useState("");
+  const [liabilityAccountId, setLiabilityAccountId] = useState(liabilityAccounts[0]?.id ?? "");
   const [principalAmount, setPrincipalAmount] = useState("");
   const [interestRatePct, setInterestRatePct] = useState("");
   const [startDate, setStartDate] = useState("");
@@ -53,7 +55,7 @@ export default function LoanForm({
       return;
     }
     if (!input.liabilityAccountId) {
-      setError("Choose a loan account.");
+      setError("Choose a type of loan.");
       return;
     }
     if (!input.principalAmount || input.principalAmount <= 0) {
@@ -91,28 +93,21 @@ export default function LoanForm({
 
         <label className="block">
           <span className={labelClass}>Lender</span>
-          <select
+          <PartnerPicker
+            role="lender"
+            options={lenders}
             value={lenderPartnerId}
-            onChange={(e) => setLenderPartnerId(e.target.value)}
-            className={fieldClass}
-          >
-            <option value="">Choose a lender…</option>
-            {lenders.map((l) => (
-              <option key={l.id} value={l.id}>
-                {l.name}
-              </option>
-            ))}
-          </select>
+            onChange={setLenderPartnerId}
+          />
         </label>
 
         <label className="block">
-          <span className={labelClass}>Loan account</span>
+          <span className={labelClass}>Type of loan</span>
           <select
             value={liabilityAccountId}
             onChange={(e) => setLiabilityAccountId(e.target.value)}
             className={fieldClass}
           >
-            <option value="">Choose an account…</option>
             {liabilityAccounts.map((a) => (
               <option key={a.id} value={a.id}>
                 {a.name}
@@ -125,11 +120,9 @@ export default function LoanForm({
           <span className={labelClass}>Principal</span>
           <span className="flex items-center gap-2 rounded-lg border border-card-border px-3 py-2 focus-within:border-primary-300">
             <span className="text-ink-muted">Rp</span>
-            <input
-              type="number"
-              min={0}
+            <MoneyInput
               value={principalAmount}
-              onChange={(e) => setPrincipalAmount(e.target.value)}
+              onValueChange={setPrincipalAmount}
               className="w-full bg-transparent text-foreground outline-none"
             />
           </span>

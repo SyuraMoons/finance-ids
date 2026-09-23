@@ -28,7 +28,7 @@ export default function RangeSelect({ range, basePath }: { range: CashFlowRange;
             const next = new URLSearchParams(searchParams.toString());
             next.set("range", o.value);
             startTransition(() => {
-              router.push(`${basePath}?${next.toString()}`);
+              router.replace(`${basePath}?${next.toString()}`, { scroll: false });
             });
           }}
           className={`rounded-md px-2.5 py-1 text-xs font-medium transition-colors disabled:opacity-60 ${

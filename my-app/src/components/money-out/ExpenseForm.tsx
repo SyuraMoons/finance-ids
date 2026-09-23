@@ -2,6 +2,7 @@
 
 import { useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import PartnerPicker from "@/components/partners/PartnerPicker";
 import { Chip } from "@/components/ui/chip";
 import { formatDate, formatRupiah } from "@/lib/format";
 import { APP_ROUTES, expenseRoute } from "@/lib/routes";
@@ -22,6 +23,7 @@ import type {
   PartnerOption,
   ProjectOption,
 } from "@/lib/types";
+import { MoneyInput } from "@/components/ui/money-input";
 
 const CATEGORY_LABELS: Record<ExpenseCategory, string> = {
   payroll: "Payroll",
@@ -306,12 +308,10 @@ export default function ExpenseForm({
               <span className={labelClass}>Amount</span>
               <span className="flex items-center gap-2 rounded-lg border border-card-border px-3 py-2 focus-within:border-primary-300">
                 <span className="text-ink-muted">Rp</span>
-                <input
-                  type="number"
-                  min={0}
+                <MoneyInput
                   value={amount}
                   disabled={readOnly}
-                  onChange={(e) => setAmount(e.target.value)}
+                  onValueChange={setAmount}
                   className="w-full bg-transparent text-foreground outline-none disabled:text-ink-muted"
                 />
               </span>
@@ -351,19 +351,13 @@ export default function ExpenseForm({
               <>
                 <label className="block">
                   <span className={labelClass}>Vendor</span>
-                  <select
+                  <PartnerPicker
+                    role="vendor"
+                    options={vendors}
                     value={partnerId}
+                    onChange={setPartnerId}
                     disabled={readOnly}
-                    onChange={(e) => setPartnerId(e.target.value)}
-                    className={fieldClass}
-                  >
-                    <option value="">Choose a vendor…</option>
-                    {vendors.map((v) => (
-                      <option key={v.id} value={v.id}>
-                        {v.name}
-                      </option>
-                    ))}
-                  </select>
+                  />
                 </label>
                 <label className="block">
                   <span className={labelClass}>Due date</span>

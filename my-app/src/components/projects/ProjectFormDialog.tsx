@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { createProject, updateProject, type ProjectFormState } from "@/lib/projects-actions";
 import type { ClientOption, ClientType, Project } from "@/lib/types";
+import { MoneyInput } from "@/components/ui/money-input";
 
 const initialState: ProjectFormState = { error: null };
 
@@ -118,11 +119,9 @@ export default function ProjectFormDialog({
                 <span className="mb-1.5 block font-medium text-title">Contract value</span>
                 <span className="flex items-center gap-2 rounded-lg border border-card-border px-3 py-2 focus-within:border-primary-300">
                   <span className="text-ink-muted">Rp</span>
-                  <input
-                    type="number"
-                    min={0}
+                  <MoneyInput
                     value={contractValue}
-                    onChange={(e) => setContractValue(e.target.value)}
+                    onValueChange={setContractValue}
                     className="w-full bg-transparent text-foreground outline-none"
                   />
                 </span>
@@ -258,10 +257,8 @@ export default function ProjectFormDialog({
                 <span className="mb-1.5 block font-medium text-title">Contract value</span>
                 <span className="flex items-center gap-2 rounded-lg border border-card-border px-3 py-2 focus-within:border-primary-300">
                   <span className="text-ink-muted">Rp</span>
-                  <input
+                  <MoneyInput
                     name="contractValue"
-                    type="number"
-                    min={0}
                     required
                     className="w-full bg-transparent text-foreground outline-none"
                   />
@@ -273,10 +270,8 @@ export default function ProjectFormDialog({
                 </span>
                 <span className="flex items-center gap-2 rounded-lg border border-card-border px-3 py-2 focus-within:border-primary-300">
                   <span className="text-ink-muted">Rp</span>
-                  <input
+                  <MoneyInput
                     name="budget"
-                    type="number"
-                    min={0}
                     className="w-full bg-transparent text-foreground outline-none"
                   />
                 </span>

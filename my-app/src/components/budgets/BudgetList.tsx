@@ -14,6 +14,7 @@ import { formatRupiah } from "@/lib/format";
 import { updateCategoryBudget, updateProjectBudgetAmount } from "@/lib/budgets-actions";
 import { expensesLaneRoute } from "@/lib/routes";
 import BudgetItemCard from "./BudgetItemCard";
+import { MoneyInput } from "@/components/ui/money-input";
 
 /**
  * Client island around BudgetItemCard: when the current role may edit
@@ -151,12 +152,9 @@ export default function BudgetList({
                 </span>
                 <span className="flex items-center gap-2 rounded-lg border border-card-border px-3 py-2 focus-within:border-primary-300">
                   <span className="text-ink-muted">Rp</span>
-                  <input
-                    type="number"
-                    min={0}
-                    step={1000000}
+                  <MoneyInput
                     value={draft}
-                    onChange={(e) => setDraft(e.target.value)}
+                    onValueChange={setDraft}
                     className="w-full bg-transparent text-foreground outline-none"
                     autoFocus
                   />

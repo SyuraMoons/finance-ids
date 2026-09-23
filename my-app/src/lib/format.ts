@@ -23,3 +23,13 @@ export function formatDate(iso: string): string {
     timeZone: "UTC",
   });
 }
+
+/** Keep digits only — the raw value behind a thousand-separated money input. */
+export function parseDigits(input: string): string {
+  return input.replace(/\D/g, "");
+}
+
+/** "1000000" → "1.000.000" (id-ID), for display inside money inputs. */
+export function formatDigits(digits: string): string {
+  return digits === "" ? "" : Number(digits).toLocaleString("id-ID");
+}
