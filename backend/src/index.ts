@@ -1,6 +1,8 @@
 import cors from "cors";
 import express from "express";
+import swaggerUi from "swagger-ui-express";
 import { env } from "./lib/env.js";
+import { openapiSpec } from "./lib/openapi.js";
 import { supabase } from "./lib/supabase.js";
 import { errorHandler } from "./middleware/error.js";
 import { requireAuth, requirePermission } from "./middleware/auth.js";
@@ -36,6 +38,17 @@ app.get("/api/health/db", async (_req, res) => {
   if (error) throw error;
   res.json({ status: "ok", clients: count });
 });
+
+// Public API docs (Swagger UI). Calling endpoints from it still needs a
+// token via its Authorize button — the spec lives in backend/openapi.yaml.
+app.get("/api/openapi.json", (_req, res) => {
+  res.json(openapiSpec);
+});
+app.use(
+  "/api/docs",
+  swaggerUi.serve,
+  swaggerUi.setup(openapiSpec, { swaggerOptions: { persistAuthorization: true } }),
+);
 
 app.use("/api/auth", authRouter);
 app.use("/api/me", requireAuth, meRouter);
