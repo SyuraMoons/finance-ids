@@ -62,9 +62,9 @@ async function getJson<T>(path: string): Promise<T> {
   return res.json();
 }
 
-export function getDashboard(): Promise<DashboardResponse> {
+export const getDashboard = cache((): Promise<DashboardResponse> => {
   return getJson<DashboardResponse>("/api/dashboard");
-}
+});
 
 export function getInvoices(): Promise<InvoicesResponse> {
   return getJson<InvoicesResponse>("/api/invoices");
