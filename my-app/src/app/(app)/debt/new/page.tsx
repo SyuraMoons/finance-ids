@@ -34,7 +34,13 @@ export default async function NewLoanPage() {
       </header>
 
       <div className="mt-6">
-        <LoanForm lenders={partners} liabilityAccounts={liabilityAccounts} />
+        {liabilityAccounts.length === 0 ? (
+          <p className="rounded-lg bg-soft px-3 py-2 text-sm text-ink-secondary">
+            No loan accounts are set up yet, so a loan can&apos;t be recorded. Ask an administrator to add one.
+          </p>
+        ) : (
+          <LoanForm lenders={partners} liabilityAccounts={liabilityAccounts} />
+        )}
       </div>
     </>
   );
