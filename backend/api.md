@@ -1,5 +1,7 @@
 # API Documentation — finance-ids backend
 
+> **Dokumentasi lengkap & interaktif ada di Swagger UI: `/api/docs`** (mis. https://finance.dev.indismart.co.id/api/docs), sumbernya `backend/openapi.yaml`. Tabel di bawah hanya ringkasan dan bisa tertinggal.
+
 Base URL (local): `http://localhost:4000` · Base URL (production): `https://finance-ids-production.up.railway.app`
 
 Semua endpoint `Authenticated` membutuhkan header `Authorization: Bearer <token>` (token didapat dari `POST /api/auth/login`). Semua nominal uang dalam Rupiah (integer, tanpa desimal). Format tanggal `YYYY-MM-DD`.
