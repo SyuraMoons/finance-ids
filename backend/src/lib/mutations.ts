@@ -739,6 +739,19 @@ export async function createLoan(input: CreateLoanInput, actorId: string): Promi
     throw new Error("liabilityAccountId must reference an account with subtype 'loan'");
   }
 
+  const { data: lender, error: lenderError } = await supabase
+    .from("partners")
+    .select("id, is_lender, is_active")
+    .eq("id", input.lenderPartnerId)
+    .maybeSingle();
+  if (lenderError) throw new Error(lenderError.message);
+  if (!lender || !lender.is_lender || !lender.is_active) {
+    throw new Error("lenderPartnerId must reference an active lender");
+  }
+  if (input.maturityDate && input.maturityDate < input.startDate) {
+    throw new Error("Maturity date can't be before the start date");
+  }
+
   const { data: loan, error: loanError } = await supabase
     .from("loans")
     .insert({
@@ -754,28 +767,38 @@ export async function createLoan(input: CreateLoanInput, actorId: string): Promi
     .single();
   if (loanError) throw new Error(loanError.message);
 
-  const { data: txn, error: txnError } = await supabase
-    .from("loan_transactions")
-    .insert({
-      loan_id: loan.id,
-      type: "disbursement",
-      txn_date: input.startDate,
-      amount: input.principalAmount,
-      created_by: actorId,
-    })
-    .select("id")
-    .single();
-  if (txnError) throw new Error(txnError.message);
+  // Not one DB transaction: undo the loan rows if any later step fails, so no orphan loan shows in Debt.
+  const rollback = async () => {
+    await supabase.from("loan_transactions").delete().eq("loan_id", loan.id);
+    await supabase.from("loans").delete().eq("id", loan.id);
+  };
+  try {
+    const { data: txn, error: txnError } = await supabase
+      .from("loan_transactions")
+      .insert({
+        loan_id: loan.id,
+        type: "disbursement",
+        txn_date: input.startDate,
+        amount: input.principalAmount,
+        created_by: actorId,
+      })
+      .select("id")
+      .single();
+    if (txnError) throw new Error(txnError.message);
 
-  await postLoanDisbursementEntry({
-    loanTransactionId: txn.id,
-    reference: input.reference,
-    lenderPartnerId: input.lenderPartnerId,
-    liabilityAccountId: input.liabilityAccountId,
-    amount: input.principalAmount,
-    txnDate: input.startDate,
-    actorId,
-  });
+    await postLoanDisbursementEntry({
+      loanTransactionId: txn.id,
+      reference: input.reference,
+      lenderPartnerId: input.lenderPartnerId,
+      liabilityAccountId: input.liabilityAccountId,
+      amount: input.principalAmount,
+      txnDate: input.startDate,
+      actorId,
+    });
+  } catch (err) {
+    await rollback();
+    throw err;
+  }
 
   await logAudit({
     userId: actorId,
@@ -809,15 +832,17 @@ export async function recordLoanRepayment(
 
   const { data: loan, error: loanError } = await supabase
     .from("loans")
-    .select("id, reference, lender_partner_id, liability_account_id, status")
+    .select("id, reference, lender_partner_id, liability_account_id, status, start_date")
     .eq("id", loanId)
     .maybeSingle();
   if (loanError) throw new Error(loanError.message);
   if (!loan) throw new Error("Loan not found");
   if (loan.status === "cancelled") throw new Error("This loan was cancelled");
+  if (paymentDate < loan.start_date) throw new Error("Payment date can't be before the loan's start date");
 
+  let outstanding = 0;
   if (principalAmount > 0) {
-    const outstanding = await fetchLoanOutstanding(loanId);
+    outstanding = await fetchLoanOutstanding(loanId);
     if (principalAmount > outstanding) {
       throw new Error(`That's more than the outstanding principal — ${formatRupiah(outstanding)} left`);
     }
@@ -846,6 +871,11 @@ export async function recordLoanRepayment(
       txnDate: paymentDate,
       actorId,
     });
+
+    if (principalAmount === outstanding) {
+      const { error: settleError } = await supabase.from("loans").update({ status: "settled" }).eq("id", loanId);
+      if (settleError) throw new Error(settleError.message);
+    }
   }
 
   if (interestAmount > 0) {

@@ -806,7 +806,6 @@ export async function fetchDebtOutstanding(status?: LoanStatus): Promise<DebtOut
   ]);
   if (loansResult.error) throw new Error(loansResult.error.message);
   if (txnsResult.error) throw new Error(txnsResult.error.message);
-  console.log(`[accounting.debt] fetched ${loansResult.data.length} loans, ${txnsResult.data.length} transactions`);
 
   const outstandingByLoan = new Map<string, number>();
   const interestPaidByLoan = new Map<string, number>();
