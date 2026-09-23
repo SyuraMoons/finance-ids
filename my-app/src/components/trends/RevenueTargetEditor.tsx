@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { formatRupiah } from "@/lib/format";
 import { updateRevenueTarget } from "@/lib/trends-actions";
+import { MoneyInput } from "@/components/ui/money-input";
 
 /** Director+ affordance (`targets.edit`): set this month's revenue target. */
 export default function RevenueTargetEditor({
@@ -72,12 +73,9 @@ export default function RevenueTargetEditor({
                 </span>
                 <span className="flex items-center gap-2 rounded-lg border border-card-border px-3 py-2 focus-within:border-primary-300">
                   <span className="text-ink-muted">Rp</span>
-                  <input
-                    type="number"
-                    min={0}
-                    step={1000000}
+                  <MoneyInput
                     value={draft}
-                    onChange={(e) => setDraft(e.target.value)}
+                    onValueChange={setDraft}
                     className="w-full bg-transparent text-foreground outline-none"
                     autoFocus
                   />

@@ -15,6 +15,7 @@ import {
 } from "@/lib/invoices-actions";
 import RecordPaymentDialog from "./RecordPaymentDialog";
 import type { Invoice, InvoiceDocument, ProjectOption } from "@/lib/types";
+import { MoneyInput } from "@/components/ui/money-input";
 
 const fieldClass =
   "w-full rounded-lg border border-card-border bg-card px-3 py-2 text-title outline-none focus:border-primary-300 disabled:bg-soft disabled:text-ink-muted";
@@ -222,12 +223,10 @@ export default function InvoiceForm({
               <span className={labelClass}>Amount</span>
               <span className="flex items-center gap-2 rounded-lg border border-card-border px-3 py-2 focus-within:border-primary-300">
                 <span className="text-ink-muted">Rp</span>
-                <input
-                  type="number"
-                  min={0}
+                <MoneyInput
                   value={amount}
                   disabled={readOnly}
-                  onChange={(e) => setAmount(e.target.value)}
+                  onValueChange={setAmount}
                   className="w-full bg-transparent text-foreground outline-none disabled:text-ink-muted"
                 />
               </span>

@@ -12,6 +12,7 @@ import {
 import { recordLoanRepayment } from "@/lib/loans-actions";
 import { formatRupiahExact } from "@/lib/format";
 import type { DebtOutstandingRow } from "@/lib/types";
+import { MoneyInput } from "@/components/ui/money-input";
 
 function todayIso(): string {
   return new Date().toISOString().slice(0, 10);
@@ -76,12 +77,9 @@ export default function RecordRepaymentDialog({
               <span className="mb-1.5 block font-medium text-title">Principal paid</span>
               <span className="flex items-center gap-2 rounded-lg border border-card-border px-3 py-2 focus-within:border-primary-300">
                 <span className="text-ink-muted">Rp</span>
-                <input
-                  type="number"
-                  min={0}
-                  max={loan.outstandingPrincipal}
+                <MoneyInput
                   value={principalAmount}
-                  onChange={(e) => setPrincipalAmount(e.target.value)}
+                  onValueChange={setPrincipalAmount}
                   className="w-full bg-transparent text-foreground outline-none"
                   autoFocus
                 />
@@ -91,11 +89,9 @@ export default function RecordRepaymentDialog({
               <span className="mb-1.5 block font-medium text-title">Interest paid</span>
               <span className="flex items-center gap-2 rounded-lg border border-card-border px-3 py-2 focus-within:border-primary-300">
                 <span className="text-ink-muted">Rp</span>
-                <input
-                  type="number"
-                  min={0}
+                <MoneyInput
                   value={interestAmount}
-                  onChange={(e) => setInterestAmount(e.target.value)}
+                  onValueChange={setInterestAmount}
                   className="w-full bg-transparent text-foreground outline-none"
                 />
               </span>

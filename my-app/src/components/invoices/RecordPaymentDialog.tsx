@@ -12,6 +12,7 @@ import {
 import { recordPayment } from "@/lib/invoices-actions";
 import { formatRupiah } from "@/lib/format";
 import type { Invoice } from "@/lib/types";
+import { MoneyInput } from "@/components/ui/money-input";
 
 function todayIso(): string {
   return new Date().toISOString().slice(0, 10);
@@ -75,12 +76,9 @@ export default function RecordPaymentDialog({
               <span className="mb-1.5 block font-medium text-title">Amount received</span>
               <span className="flex items-center gap-2 rounded-lg border border-card-border px-3 py-2 focus-within:border-primary-300">
                 <span className="text-ink-muted">Rp</span>
-                <input
-                  type="number"
-                  min={0}
-                  max={invoice.outstanding}
+                <MoneyInput
                   value={amountReceived}
-                  onChange={(e) => setAmountReceived(e.target.value)}
+                  onValueChange={setAmountReceived}
                   className="w-full bg-transparent text-foreground outline-none"
                   autoFocus
                 />
