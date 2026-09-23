@@ -1708,6 +1708,8 @@ paths:
         Permission: `accounting.post` (superadmin, admin).
 
         Posts the disbursement. Loan principal is a liability, never revenue.
+
+        Returns 400 if `lenderPartnerId` isn't an active lender, or if `maturityDate` is before `startDate`. If any step after the loan row is created fails, the partly created loan is rolled back.
       requestBody:
         required: true
         content:
@@ -1744,6 +1746,8 @@ paths:
         Permission: `accounting.post` (superadmin, admin).
 
         Missing amounts count as 0. Interest is entered manually here — there's no automatic accrual.
+
+        Returns 400 if `paymentDate` is before the loan's start date. Repaying the full outstanding principal marks the loan `settled`.
       requestBody:
         required: true
         content:
